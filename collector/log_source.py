@@ -13,8 +13,8 @@ def log_stream(db, start_ts):
     """
     cur_ts = start_ts
     marker = '0'
+    rds = boto3.client('rds')
     while True:
-        rds = boto3.client('rds')
         log_file = None
         try:
             log_rec = sorted(
