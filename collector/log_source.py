@@ -2,15 +2,20 @@ import boto3
 
 LINES_PER_API_CALL = 3000
 
+
 # TODO: Persist marker/file in db we can resume on process restart
 def log_stream(db, start_ts):
-    """
-    Returns a generator that acts as a log tail. Every call
-    will return the next line of the log. If no log entries have
-    been written since the last invokation then None is returned.
+    """Returns a generator that acts as a log tail.
+
+    Every call will return the next line of the log. If no log
+    entries have been written since the last invokation then
+    None is returned.
 
     This does not mean the stream is dead, but that there just
     isn't any new data available yet. Wait a bit and then try again.
+
+    db = AWS DBInstanceIdentifier
+    start_ts = timestamp in ms (ie. time.time()*1000)
     """
     cur_ts = start_ts
     marker = '0'
@@ -21,7 +26,7 @@ def log_stream(db, start_ts):
             log_rec = sorted(
                 rds.describe_db_log_files(DBInstanceIdentifier=db,
                                           FileLastWritten=cur_ts)['DescribeDBLogFiles'],
-                key=lambda x:x['LastWritten'])[0]
+                key=lambda x: x['LastWritten'])[0]
 
             # only reset marker when we change files
             if log_file != log_rec['LogFileName']:
