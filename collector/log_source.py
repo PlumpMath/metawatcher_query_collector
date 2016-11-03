@@ -55,3 +55,45 @@ def log_stream(db, start_ts):
 
             while len(buffer) > 0:
                 yield buffer.pop(0)
+
+
+def query_stream(db, start_ts):
+    """Same as log_stream but returns parsed query log entries"""
+    log = log_stream(db, start_ts)
+
+    PS_WAIT = 0
+    PS_READING = 1
+
+    state = PS_WAIT
+    cur_msg = {}
+    for line in log:
+        if line is None:
+            yield None
+        else:
+            # Currently reading a record
+            if state == PS_READING:
+                if ':DETAIL: ' in line:  # save detail entries
+                    try:
+                        parts = line.split(':')
+                        cur_msg['detail'].append(parts[8].strip())
+                    except IndexError as e:
+                        print('Failed to parse DETAIL line: {}\n{}'.format(e, line))
+                elif line.startswith('\t'):  # multiline query statement
+                    cur_msg['query'] += ' {}'.format(line.strip())
+                else:
+                    state = PS_WAIT
+                    yield cur_msg
+
+            # Waiting to start a new record
+            if state == PS_WAIT:
+                if ':LOG: ' in line:  # start reading a new entry
+                    try:
+                        cur_msg = {}
+                        parts = line.split(':')
+                        cur_msg['src_ip'] = parts[3].split('(')[0].strip()
+                        cur_msg['user'] = parts[4].split('@')[0].strip()
+                        cur_msg['query'] = ':'.join(parts[8:]).strip()
+                        cur_msg['detail'] = []
+                        state = PS_READING
+                    except IndexError as e:
+                        print('Failed to parse LOG line: {}\n{}'.format(e, line))
