@@ -42,6 +42,7 @@ async def read_aggregates(aggs):
             for k,v in a.sample().items():
                 rec = {}
                 rec['type'] = 'count_selects'
+                rec['db'] = a.db
                 rec['name'] = k
                 rec['value'] = v
                 print(rec)
@@ -53,7 +54,7 @@ if __name__ == '__main__':
 
     for db in databases:
         log = query_stream(db, (time.time()*1000))
-        agg = Aggregator(count_selects, lambda: defaultdict(int))
+        agg = Aggregator(db, count_selects, lambda: defaultdict(int))
         aggs.append(agg)
         asyncio.ensure_future(log_processor(log, agg))
 

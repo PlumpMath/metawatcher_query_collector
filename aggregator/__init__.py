@@ -1,5 +1,6 @@
 class Aggregator:
-    def __init__(self, proc_fn, init_state_fn=None):
+    def __init__(self, db, proc_fn, init_state_fn=None):
+        self.db = db
         self.proc_fn = proc_fn
         self.init_state_fn = dict
         if init_state_fn:
