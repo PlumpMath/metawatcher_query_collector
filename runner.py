@@ -15,6 +15,9 @@ def send_log(msg):
         path = '/receiver/v1/http/{}'.format('SUMO_SECRET')
         conn = http.client.HTTPSConnection(url)
         conn.request('POST', path, body=msg)
+        resp = conn.get_response()
+        if resp.status != 200:
+            print('HTTP {}: {}'.format(status, resp.read(200)))
     except Exception as e:
         print(e)
 
