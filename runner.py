@@ -52,7 +52,7 @@ if __name__ == '__main__':
     aggs = []
 
     for db in databases:
-        log = query_stream(db, (time.time()*1000)-(3600*2*1000))
+        log = query_stream(db, (time.time()*1000))
         agg = Aggregator(count_selects, lambda: defaultdict(int))
         aggs.append(agg)
         asyncio.ensure_future(log_processor(log, agg))
