@@ -1,4 +1,5 @@
 import boto3
+import asyncio
 
 LINES_PER_API_CALL = 3000
 
@@ -17,7 +18,7 @@ def log_stream(db, start_ts):
     db = AWS DBInstanceIdentifier
     start_ts = timestamp in ms (ie. time.time()*1000)
     """
-    cur_ts = start_ts
+    cur_ts = int(start_ts)
     marker = '0'
     rds = boto3.client('rds')
     while True:
@@ -48,7 +49,7 @@ def log_stream(db, start_ts):
                                                         NumberOfLines=LINES_PER_API_CALL)
                 marker = resp['Marker']
                 more = resp['AdditionalDataPending']
-                print('File={}, Marker={}, More={}'.format(log_file, marker, more))
+                print('Db={}, File={}, Marker={}, More={}'.format(db, log_file, marker, more))
                 buffer.extend(resp['LogFileData'].splitlines())
             else:
                 more = False
