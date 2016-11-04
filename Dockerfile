@@ -4,4 +4,4 @@ CMD cd /opt && \
     git clone https://github.com/hatmatter/metawatcher_query_collector.git && \
     cd metawatcher_query_collector && \
     pip install -r requirements.txt && \
-    python runner.py
+    python -u runner.py
