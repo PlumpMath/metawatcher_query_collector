@@ -12,7 +12,7 @@ SUMO_SECRET = os.environ['SUMO_SECRET']
 def send_log(msg):
     try:
         url = 'endpoint2.collection.sumologic.com'
-        path = '/receiver/v1/http/{}'.format('SUMO_SECRET')
+        path = '/receiver/v1/http/{}'.format(os.environ['SUMO_SECRET'])
         conn = http.client.HTTPSConnection(url)
         conn.request('POST', path, body=msg)
         resp = conn.getresponse()
