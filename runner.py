@@ -17,7 +17,7 @@ def send_log(msg):
         conn.request('POST', path, body=msg)
         resp = conn.getresponse()
         if resp.status != 200:
-            print('HTTP {}: {}'.format(status, resp.read(200)))
+            print('HTTP {}: {}'.format(resp.status, resp.read(200)))
     except Exception as e:
         print(e)
 
