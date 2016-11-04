@@ -1,8 +1,22 @@
+import os
 import time
 import asyncio
+import http.client
 from collector.log_source import query_stream
 from aggregator import Aggregator
 from collections import defaultdict
+
+
+SUMO_SECRET = os.environ['SUMO_SECRET']
+
+def send_log(msg):
+    try:
+        url = 'endpoint2.collection.sumologic.com'
+        path = '/receiver/v1/http/{}'.format('SUMO_SECRET')
+        conn = http.client.HTTPSConnection(url)
+        conn.request('POST', path, body=msg)
+    except Exception as e:
+        print(e)
 
 
 def count_selects(rec, state):
@@ -39,13 +53,16 @@ async def read_aggregates(aggs):
     while True:
         await asyncio.sleep(60)
         for a in aggs:
+            buffer = ''
             for k,v in a.sample().items():
                 rec = {}
                 rec['type'] = 'count_selects'
                 rec['db'] = a.db
                 rec['name'] = k
                 rec['value'] = v
-                print(rec)
+                buffer += '{}\n'.format(rec)
+            print(buffer)
+            send_log(buffer)
 
 
 if __name__ == '__main__':
