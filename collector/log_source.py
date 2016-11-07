@@ -1,10 +1,8 @@
 import boto3
-import asyncio
 
 LINES_PER_API_CALL = 3000
 
 
-# TODO: Persist marker/file in db we can resume on process restart
 def log_stream(db, start_ts):
     """Returns a generator that acts as a log tail.
 
